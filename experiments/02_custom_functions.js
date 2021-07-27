@@ -205,6 +205,19 @@ function generate_trial_data(){
                 
             
                 
+                var tempCanvas=document.createElement("canvas");
+                var tctx=tempCanvas.getContext("2d");
+
+                var scale = 3
+                var cw=canvas.width;
+                var ch=canvas.height;
+                tempCanvas.width=cw;
+                tempCanvas.height=ch;
+                tctx.drawImage(canvas,0,0);
+                canvas.width*=scale;
+                canvas.height*=scale;
+                var ctx=canvas.getContext('2d');
+                ctx.drawImage(tempCanvas,0,0,cw,ch,0,0,cw*scale,ch*scale);
 
                 
                   
