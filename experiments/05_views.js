@@ -53,7 +53,7 @@ const intro = magpieViews.view_generator("intro", {
             Before we begin, we provide you with some general information. Please read it carefully.
             <br/ >
             <br/ >
-            The experiment will take approximately half an our. Please take this time and make sure that you are not interrupted.
+            The experiment will take approximately half an hour. Please take this time and make sure that you are not interrupted.
             Each participant gets a unique identification number which does not trace back to you, meaning this experiment is anonymous.
             If you usually wear glasses (or other visual aid) when working on your screen, please put them on.
             <br/ >
