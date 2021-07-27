@@ -50,7 +50,7 @@ const intro = magpieViews.view_generator("intro", {
             <strong>Hello there and welcome to our experiment!</strong>
             <br/ >
             <br/ >
-            Before we begin, we provide you some general information. Please read it carefully.
+            Before we begin, we provide you with some general information. Please read it carefully.
             <br/ >
             <br/ >
             The experiment will take approximately half an our. Please take this time and make sure that you are not interrupted.
