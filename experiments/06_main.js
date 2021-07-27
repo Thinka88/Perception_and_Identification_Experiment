@@ -12,11 +12,11 @@ $("document").ready(function() {
     // e.g. >> window.magpie_monitor or window.magpie_monitor.findNextView()
     // in all other modes null will be returned
     window.magpie_monitor = magpieInit({
-        
+
         // You have to specify all views you want to use in this experiment and the order of them
         views_seq: [
             intro,
-            ... coin == 'discrimination' ? [instructions_discrimination,key_press_discrimination] : [instructions_identification,key_press_identification],
+            ... coin == 'discrimination' ? [instructions_discrimination,discrimination] : [instructions_identification,identification],
             post_test,
             thanks,
         ],
@@ -35,7 +35,7 @@ $("document").ready(function() {
         progress_bar: {
             in: [
                 // list the view-names of the views for which you want a progress bar
-                coin == 'discrimination' ? key_press_discrimination.name : key_press_identification.name,
+                coin == 'discrimination' ? discrimination.name : identification.name,
             ],
              // Possible styles are "default", "separate" and "chunks"
             style: "separate",
