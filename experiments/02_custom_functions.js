@@ -67,33 +67,33 @@ function generate_trial_data(){
             }
 
             if(coin == 'discrimination'){
-                var canvas = document.createElement('canvas');
+                /* var canvas = document.createElement('canvas');
                 canvas.width = 60;
                 canvas.height = 60;
                 var ctx = canvas.getContext('2d');
                 var sequence_counter = 0
-                for(y = 0; y < canvas.height/2; y++){
-                    for(x = 0; x < canvas.width; x++){
+                for(x = 0; x < canvas.height/2; x++){
+                    for(y = 0; y < canvas.width; y++){
                         if(top[0][sequence_counter] == 0){
                             ctx.fillStyle = "rgb(0,109,160)";
-                            ctx.fillRect( y, x, 1, 1 );
+                            ctx.fillRect( x, y, 1, 1 );
                         }else{
                             ctx.fillStyle = "rgb(200,81,0)";
-                            ctx.fillRect( y, x, 1, 1 );
+                            ctx.fillRect( x, y, 1, 1 );
                         }
                         sequence_counter++;;
                     }
                 }
 
                 sequence_counter = 0;
-                for(y = canvas.height/2; y<canvas.height; y++){
-                    for(x = 0; x<canvas.width; x++){
+                for(x = canvas.height/2; x<canvas.height; x++){
+                    for(y = 0; y<canvas.width; y++){
                         if(top[1][sequence_counter] == 0){
                             ctx.fillStyle = "rgb(0,109,160)";
-                            ctx.fillRect( y, x, 1, 1 );
+                            ctx.fillRect( x, y, 1, 1 );
                         }else{
                             ctx.fillStyle = "rgb(200,81,0)";
-                            ctx.fillRect( y, x, 1, 1 );
+                            ctx.fillRect( x, y, 1, 1 );
                         }
                         sequence_counter++;
                     }
@@ -132,10 +132,95 @@ function generate_trial_data(){
                     h: 'horizontal',
                     expected: expected, 
                     picture: canvas.toDataURL(),
-                });
+                }); */
 
             }else{
+                var canvas = document.createElement('canvas');
+                canvas.width = 60;
+                canvas.height = 110;
+                var ctx = canvas.getContext('2d');
+                var sequence_counter = 0
+                
+                expected = 'horizontal'
+                if(Math.random()<0.5){    
+                    canvas.width = 110;
+                    canvas.height = 60;                                                                                  
+                    for(x = 0; x < (canvas.width-50)/2; x++){
+                        for(y = 0; y < canvas.height; y++){
+                            if(top[0][sequence_counter] == 0){
+                                ctx.fillStyle = "rgb(0,109,160)";
+                                ctx.fillRect( x, y, 1, 1 );
+                            }else{
+                                ctx.fillStyle = "rgb(200,81,0)";
+                                ctx.fillRect( x, y, 1, 1 );
+                            }
+                            sequence_counter++;;
+                        }
+                    }
+    
+                    sequence_counter = 0;
+                    for(x = canvas.width-30; x<canvas.width; x++){
+                        for(y = 0; y<canvas.height; y++){
+                            if(top[1][sequence_counter] == 0){
+                                ctx.fillStyle = "rgb(0,109,160)";
+                                ctx.fillRect( x, y, 1, 1 );
+                            }else{
+                                ctx.fillStyle = "rgb(200,81,0)";
+                                ctx.fillRect( x, y, 1, 1 );
+                            }
+                            sequence_counter++;
+                        }
+                    }
+                    expected = 'vertical'
+                }else{
+                    for(y = 0; y < (canvas.height-50)/2; y++){
+                        for(x = 0; x < canvas.width; x++){
+                            if(top[0][sequence_counter] == 0){
+                                ctx.fillStyle = "rgb(0,109,160)";
+                                ctx.fillRect( x, y, 1, 1 );
+                            }else{
+                                ctx.fillStyle = "rgb(200,81,0)";
+                                ctx.fillRect( x, y, 1, 1 );
+                            }
+                            sequence_counter++;;
+                        }
+                    }
+    
+                    sequence_counter = 0;
+                    for(y = canvas.height-30; y<canvas.height; y++){
+                        for(x = 0; x<canvas.width; x++){
+                            if(top[1][sequence_counter] == 0){
+                                ctx.fillStyle = "rgb(0,109,160)";
+                                ctx.fillRect( x, y, 1, 1 );
+                            }else{
+                                ctx.fillStyle = "rgb(200,81,0)";
+                                ctx.fillRect( x, y, 1, 1 );
+                            }
+                            sequence_counter++;
+                        }
+                    }
+                }
 
+
+                
+            
+                
+
+                
+                  
+                
+                  
+
+                console.log(canvas.toDataURL());
+                trial_data.push({
+                    question: 'Can the matrix be devided horizontally or vertically',
+                    key1: 'v',
+                    key2: 'h',
+                    v: 'vertical',
+                    h: 'horizontal',
+                    expected: expected, 
+                    picture: canvas.toDataURL(),
+                });
             }
         }
     }
