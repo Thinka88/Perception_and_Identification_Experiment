@@ -124,7 +124,6 @@ function generate_trial_data(){
                 ctx.drawImage(tempCanvas,0,0,cw,ch,0,0,cw*scale,ch*scale);
                   
 
-                console.log(canvas.toDataURL());
                 trial_data.push({
                     question: 'Can the matrix be devided horizontally or vertically?',
                     key1: 'v',
@@ -201,6 +200,7 @@ function generate_trial_data(){
                             sequence_counter++;
                         }
                     }
+
                 }
 
 
@@ -210,6 +210,7 @@ function generate_trial_data(){
                 var tempCanvas=document.createElement("canvas");
                 var tctx=tempCanvas.getContext("2d");
 
+                
                 var scale = 3
                 var cw=canvas.width;
                 var ch=canvas.height;
