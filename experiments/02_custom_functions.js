@@ -49,6 +49,9 @@ function generateSequence(length, switch_rate){
 }
 
 function generate_trial_data(){
+    console.log(String.fromCharCode(38));
+    console.log(String.fromCharCode(40));
+
     var trial_data = new Array();
     var top = new Array(2);
     var expected = '';
@@ -125,7 +128,7 @@ function generate_trial_data(){
 
                 console.log(canvas.toDataURL());
                 trial_data.push({
-                    question: 'Can the matrix be devided horizontally or vertically',
+                    question: 'Can the matrix be devided horizontally or vertically?',
                     key1: 'v',
                     key2: 'h',
                     v: 'vertical',
@@ -227,11 +230,11 @@ function generate_trial_data(){
 
                 console.log(canvas.toDataURL());
                 trial_data.push({
-                    question: 'Can the matrix be devided horizontally or vertically',
-                    key1: 'v',
-                    key2: 'h',
-                    v: 'vertical',
-                    h: 'horizontal',
+                    question: 'Can the matrix be devided horizontally or vertically?',
+                    key1: '&',
+                    key2: '(',
+                    '&': 'up',
+                    '(': 'down',
                     expected: expected, 
                     picture: canvas.toDataURL(),
                     switch_rate : i
@@ -242,10 +245,6 @@ function generate_trial_data(){
 
     return trial_data;
 }
-
-generate_trial_data();
-
-
 
 /* Hooks  
 *
