@@ -67,7 +67,7 @@ function generate_trial_data(){
             }
 
             if(coin == 'discrimination'){
-                /* var canvas = document.createElement('canvas');
+                var canvas = document.createElement('canvas');
                 canvas.width = 60;
                 canvas.height = 60;
                 var ctx = canvas.getContext('2d');
@@ -132,7 +132,8 @@ function generate_trial_data(){
                     h: 'horizontal',
                     expected: expected, 
                     picture: canvas.toDataURL(),
-                }); */
+                    switch_rate : i
+                });
 
             }else{
                 var canvas = document.createElement('canvas');
@@ -233,6 +234,7 @@ function generate_trial_data(){
                     h: 'horizontal',
                     expected: expected, 
                     picture: canvas.toDataURL(),
+                    switch_rate : i
                 });
             }
         }

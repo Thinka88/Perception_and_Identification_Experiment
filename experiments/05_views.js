@@ -178,7 +178,7 @@ const discrimination = magpieViews.view_generator("key_press", {
   trials: trial_info.key_press.length,
   // name should be identical to the variable name
   name: 'discrimination',
-  data: trial_info.key_press,
+  data: _.shuffle(trial_info.key_press),
   // you can add custom functions at different stages through a view's life cycle
   // hook: {
   //     after_response_enabled: check_response
@@ -190,7 +190,7 @@ const identification = magpieViews.view_generator("key_press", {
   trials: trial_info.key_press.length,
   // name should be identical to the variable name
   name: 'identification',
-  data: trial_info.key_press,
+  data: _.shuffle(trial_info.key_press),
   // you can add custom functions at different stages through a view's life cycle
   // hook: {
   //     after_response_enabled: check_response
