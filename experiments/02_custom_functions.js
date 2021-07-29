@@ -54,7 +54,7 @@ function generate_trial_data(){
     var top = new Array(2);
     var expected = '';
     for(let i=0; i<=1; i = Math.round((i +0.02)*100)/100 ){
-        for(let j=0; j<10; j++){
+        for(let j=0; j<1; j++){
             random_sequence = generateSequence(1800,0.5);
             nonrandom_sequence = generateSequence(1800,i);
 
@@ -142,7 +142,7 @@ function generate_trial_data(){
                 var ctx = canvas.getContext('2d');
                 var sequence_counter = 0
                 
-                expected = 'horizontal'
+                ori = 'horizontal'
                 if(Math.random()<0.5){    
                     canvas.width = 110;
                     canvas.height = 60;                                                                                  
@@ -172,7 +172,7 @@ function generate_trial_data(){
                             sequence_counter++;
                         }
                     }
-                    expected = 'vertical'
+                    ori = 'vertical'
                 }else{
                     for(y = 0; y < (canvas.height-50)/2; y++){
                         for(x = 0; x < canvas.width; x++){
@@ -222,15 +222,16 @@ function generate_trial_data(){
                 var ctx=canvas.getContext('2d');
                 ctx.drawImage(tempCanvas,0,0,cw,ch,0,0,cw*scale,ch*scale);
                   
+                console.log(top[0] == nonrandom_sequence)
 
-                if(expected == 'vertical'){
+                if(ori == 'vertical'){
                     trial_data.push({
                     question: 'Can the matrix be devided horizontally or vertically?',
                     key1 : 'a',
                     key2 : 'd',
                     'a' : 'links/left',
                     'd' : 'rechts/right',
-                    expected: expected, 
+                    expected: (top[0] == random_sequence ? 'links/left' : 'rechts/right'), 
                     picture: canvas.toDataURL(),
                     switch_rate : i
                     })
@@ -241,7 +242,7 @@ function generate_trial_data(){
                         key2 : 's',
                         'w' : 'oben/up',
                         's' : 'unten/down',
-                        expected: expected, 
+                        expected: (top[0] == random_sequence ? 'oben/up' : 'unten/down'), 
                         picture: canvas.toDataURL(),
                         switch_rate : i                    
                     })   
