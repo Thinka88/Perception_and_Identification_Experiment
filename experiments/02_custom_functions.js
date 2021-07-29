@@ -29,13 +29,6 @@ const generateID = function(len) {
 };
 // Declare your helper functions here
 
-function newDownloadAnchor(filename,dataURL) {
-    var anchor = document.createElement("a");
-    anchor.download = filename;
-    anchor.title = "Get the canvas";
-    anchor.href = dataURL;
-    return(anchor);
-}
 
 function generateSequence(length, switch_rate){
     var sequence = new Array(length-1);
@@ -60,7 +53,7 @@ function generate_trial_data(){
     var top = new Array(2);
     var expected = '';
     for(let i=0; i<=1; i = Math.round((i +0.02)*100)/100 ){
-        for(let j=0; j<1; j++){
+        for(let j=0; j<10; j++){
             random_sequence = generateSequence(1800,0.5);
             nonrandom_sequence = generateSequence(1800,i);
 
@@ -74,7 +67,7 @@ function generate_trial_data(){
             }
 
             if(coin == 'discrimination'){
-                var canvas = document.createElement('canvas');
+                /* var canvas = document.createElement('canvas');
                 canvas.width = 60;
                 canvas.height = 60;
                 var ctx = canvas.getContext('2d');
@@ -130,9 +123,6 @@ function generate_trial_data(){
                 ctx.drawImage(tempCanvas,0,0,cw,ch,0,0,cw*scale,ch*scale);
                   
 
-                var url = canvas.toDataURL();
-                
-
                 console.log(canvas.toDataURL());
                 trial_data.push({
                     question: 'Can the matrix be devided horizontally or vertically',
@@ -142,8 +132,7 @@ function generate_trial_data(){
                     h: 'horizontal',
                     expected: expected, 
                     picture: canvas.toDataURL(),
-                    switch_rate : i 
-                });
+                }); */
 
             }else{
                 var canvas = document.createElement('canvas');
@@ -244,7 +233,6 @@ function generate_trial_data(){
                     h: 'horizontal',
                     expected: expected, 
                     picture: canvas.toDataURL(),
-                    switch_rate : i
                 });
             }
         }
