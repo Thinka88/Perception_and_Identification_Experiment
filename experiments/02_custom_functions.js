@@ -49,8 +49,6 @@ function generateSequence(length, switch_rate){
 }
 
 function generate_trial_data(){
-    console.log(String.fromCharCode(38));
-    console.log(String.fromCharCode(40));
 
     var trial_data = new Array();
     var top = new Array(2);
@@ -222,23 +220,33 @@ function generate_trial_data(){
                 canvas.height*=scale;
                 var ctx=canvas.getContext('2d');
                 ctx.drawImage(tempCanvas,0,0,cw,ch,0,0,cw*scale,ch*scale);
-
-                
-                  
-                
                   
 
-                console.log(canvas.toDataURL());
-                trial_data.push({
+                if(expected == 'vertical'){
+                    trial_data.push({
                     question: 'Can the matrix be devided horizontally or vertically?',
-                    key1: '&',
-                    key2: '(',
-                    '&': 'up',
-                    '(': 'down',
+                    key1 : 'a',
+                    key2 : 'd',
+                    'a' : 'links/left',
+                    'd' : 'rechts/right',
                     expected: expected, 
                     picture: canvas.toDataURL(),
                     switch_rate : i
-                });
+                    })
+                }else{
+                    trial_data.push({
+                        question: 'Can the matrix be devided horizontally or vertically?',
+                        key1 : 'w',
+                        key2 : 's',
+                        'w' : 'oben/up',
+                        's' : 'unten/down',
+                        expected: expected, 
+                        picture: canvas.toDataURL(),
+                        switch_rate : i                    
+                    })   
+                
+                
+                }
             }
         }
     }
