@@ -73,13 +73,15 @@ const instructions_discrimination = magpieViews.view_generator("instructions", {
   text: `In jedem Durchgang des Experiments wirst du ein zweifarbiges Viereck sehen.
         Jede Matrix kann <strong>horizontal (-) oder vertikal (|)</strong> in zwei Hälften geteilt werden.
         Die beiden Hälften werden aus unterschiedlichen Prozessen erzeugt.
-        Deine Aufgabe besteht darin, die Ausrichtung der Grenze zwischen den beiden Hälften zu beurteilen, indem du die <strong>v-Taste</strong> für vertikal oder die <strong>h-Taste</strong> für horizontal drücken.
+        Deine Aufgabe besteht darin, die Ausrichtung der Grenze zwischen den beiden Hälften zu beurteilen, indem du die <strong>'v' Taste</strong> für vertikal oder die <strong>'h' Taste</strong> für horizontal drücken.
+        Bitte drücke erst eine Taste, wenn das Bild nicht mehr zu sehen ist.
         <br/ >
         <br/ >
         In each trial of the experiment you will see a square made up of two colours.
         Each matrix can be divided into two halves either <strong>horizontally (-) or vertically (|)</strong>.
         The two halves are generated from different processes.
-        Your task is to judge the orientation of the boundary between the two halves, by pressing <strong>v key</strong> for vertical or <strong>h</strong> key for horizontal.
+        Your task is to judge the orientation of the boundary between the two halves, by pressing <strong>'v' key</strong> for vertical or <strong>'h' key</strong> for horizontal.
+        Please press the respective key when the picture is gone.
 `,
   buttonText: 'starte das Experiment / begin the experiment'
 });
@@ -94,16 +96,18 @@ const instructions_identification = magpieViews.view_generator("instructions", {
         Eine Hälfte wird aus einem zufälligen Prozess und die andere aus einem nicht-zufälligen Prozess erzeugt.
         <br/ >
         Deine Aufgabe besteht darin, zu identifizieren, welche Hälfte eher durch einen <strong>zufälligen</strong> Prozess erzeugt wird als durch einen nicht-zufälligen Prozess.
-        Drücke die <strong>obere oder untere Pfeiltaste</strong>, wenn die Teilung horizontal ist, und nach <strong>links oder rechts</strong>, wenn sie vertikal ist.
+        Drücke die <strong>'w' Taste (oben) oder 's' Taste (unten)</strong>, wenn die Teilung horizontal ist, und nach <strong>'a' Taste (links) oder 'd' Taste (rechts)</strong>, wenn sie vertikal ist.
+        Bitte drücke erst eine Taste, wenn das Bild nicht mehr zu sehen ist.
         <br/ >
         <br/ >
         In each trial of the experiment you will see a square made up of two colours.
-        Each matrix is divided into two halves either <strong>horizontally or vertically</strong>.
+        Each matrix is divided into two halves either <strong>horizontally (-) or vertically (|)</strong>.
         The two halves are separated by a gap.
         One halve is generated from a random process and the other from a nonrandom process.
         <br/ >
         Your task is to identify which half is more likely to be produced by a <strong>random</strong> process than a nonrandom process.
-        Press the <strong>top or bottom arrow key</strong> if the division is horizontal, and <strong>left or right</strong> if vertical.
+        Press the <strong>'w' key (up) oder 's' key (down)</strong> if the division is horizontal, and <strong>'a' key (left) oder 'd' key (right)</strong> if vertical.
+        Please press the respective key when the picture is gone.
 
 `,
   buttonText: 'starte das Experiment / begin the experiment'
