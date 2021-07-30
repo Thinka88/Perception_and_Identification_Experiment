@@ -99,8 +99,8 @@ function generate_trial_data(){
                         sequence_counter++;
                     }
                 }
-            
-            
+
+
                 expected = 'horizontal'
                 if(Math.random()<0.5){
                     ctx.translate(canvas.width/2,canvas.height/2);
@@ -122,15 +122,15 @@ function generate_trial_data(){
                 canvas.height*=scale;
                 var ctx=canvas.getContext('2d');
                 ctx.drawImage(tempCanvas,0,0,cw,ch,0,0,cw*scale,ch*scale);
-                  
+
 
                 trial_data.push({
-                    question: 'Can the matrix be devided horizontally or vertically?',
+                    question: 'Kann die Matrix horizontal oder vertikal getrennt werden? / Can the matrix be devided horizontally or vertically?',
                     key1: 'v',
                     key2: 'h',
                     v: 'vertical',
                     h: 'horizontal',
-                    expected: expected, 
+                    expected: expected,
                     picture: canvas.toDataURL(),
                     switch_rate : i
                 });
@@ -141,11 +141,11 @@ function generate_trial_data(){
                 canvas.height = 110;
                 var ctx = canvas.getContext('2d');
                 var sequence_counter = 0
-                
+
                 ori = 'horizontal'
-                if(Math.random()<0.5){    
+                if(Math.random()<0.5){
                     canvas.width = 110;
-                    canvas.height = 60;                                                                                  
+                    canvas.height = 60;
                     for(x = 0; x < (canvas.width-50)/2; x++){
                         for(y = 0; y < canvas.height; y++){
                             if(top[0][sequence_counter] == 0){
@@ -158,7 +158,7 @@ function generate_trial_data(){
                             sequence_counter++;;
                         }
                     }
-    
+
                     sequence_counter = 0;
                     for(x = canvas.width-30; x<canvas.width; x++){
                         for(y = 0; y<canvas.height; y++){
@@ -186,7 +186,7 @@ function generate_trial_data(){
                             sequence_counter++;;
                         }
                     }
-    
+
                     sequence_counter = 0;
                     for(y = canvas.height-30; y<canvas.height; y++){
                         for(x = 0; x<canvas.width; x++){
@@ -204,13 +204,13 @@ function generate_trial_data(){
                 }
 
 
-                
-            
-                
+
+
+
                 var tempCanvas=document.createElement("canvas");
                 var tctx=tempCanvas.getContext("2d");
 
-                
+
                 var scale = 3
                 var cw=canvas.width;
                 var ch=canvas.height;
@@ -221,33 +221,33 @@ function generate_trial_data(){
                 canvas.height*=scale;
                 var ctx=canvas.getContext('2d');
                 ctx.drawImage(tempCanvas,0,0,cw,ch,0,0,cw*scale,ch*scale);
-                  
+
                 console.log(top[0] == nonrandom_sequence)
 
                 if(ori == 'vertical'){
                     trial_data.push({
-                    question: 'Can the matrix be devided horizontally or vertically?',
+                    question: 'Welche Matrix würde zufällig erzeugt? / Which matrix is randomly generated?',
                     key1 : 'a',
                     key2 : 'd',
                     'a' : 'links/left',
                     'd' : 'rechts/right',
-                    expected: (top[0] == random_sequence ? 'links/left' : 'rechts/right'), 
+                    expected: (top[0] == random_sequence ? 'links/left' : 'rechts/right'),
                     picture: canvas.toDataURL(),
                     switch_rate : i
                     })
                 }else{
                     trial_data.push({
-                        question: 'Can the matrix be devided horizontally or vertically?',
+                        question: 'Welche Matrix würde zufällig erzeugt? / Which matrix is randomly generated?',
                         key1 : 'w',
                         key2 : 's',
                         'w' : 'oben/up',
                         's' : 'unten/down',
-                        expected: (top[0] == random_sequence ? 'oben/up' : 'unten/down'), 
+                        expected: (top[0] == random_sequence ? 'oben/up' : 'unten/down'),
                         picture: canvas.toDataURL(),
-                        switch_rate : i                    
-                    })   
-                
-                
+                        switch_rate : i
+                    })
+
+
                 }
             }
         }
@@ -256,7 +256,7 @@ function generate_trial_data(){
     return trial_data;
 }
 
-/* Hooks  
+/* Hooks
 *
 *
 */
