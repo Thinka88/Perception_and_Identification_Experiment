@@ -1,8 +1,10 @@
 # Perception and Identification Experiment
 
-This repository contains a replication perception and identification experiment.
+This repository contains a replicated perception and identification experiment as well as all our collected data, analysis and writing.
 
-link zu paper einfügen
+The link to the original study can be found [here]()
+
+If you just want to access the code of the implemented experiment, please follow this link: [Code Repo](https://https://github.com/Thinka88/Perception-and-Identification-Experiment-Code)
 
 ## Experiment
 
