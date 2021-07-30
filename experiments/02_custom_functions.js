@@ -54,7 +54,7 @@ function generate_trial_data(){
     var top = new Array(2);
     var expected = '';
     for(let i=0; i<=1; i = Math.round((i +0.02)*100)/100 ){
-        for(let j=0; j<1; j++){
+        for(let j=0; j<10; j++){
             random_sequence = generateSequence(1800,0.5);
             nonrandom_sequence = generateSequence(1800,i);
 
