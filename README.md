@@ -1,6 +1,8 @@
 # Perception and Identification Experiment
 
-This repository contains a perception and identification experiment.
+This repository contains a replication perception and identification experiment.
+
+link zu paper einfügen
 
 ## Experiment
 
