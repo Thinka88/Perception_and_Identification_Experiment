@@ -226,7 +226,7 @@ function generate_trial_data(){
 
                 if(ori == 'vertical'){
                     trial_data.push({
-                    question: 'Welche Matrix würde zufällig erzeugt? / Which matrix is randomly generated?',
+                    question: 'Welche Matrix wurde zufällig erzeugt? / Which matrix is randomly generated?',
                     key1 : 'a',
                     key2 : 'd',
                     'a' : 'links/left',
@@ -237,7 +237,7 @@ function generate_trial_data(){
                     })
                 }else{
                     trial_data.push({
-                        question: 'Welche Matrix würde zufällig erzeugt? / Which matrix is randomly generated?',
+                        question: 'Welche Matrix wurde zufällig erzeugt? / Which matrix is randomly generated?',
                         key1 : 'w',
                         key2 : 's',
                         'w' : 'oben/up',
