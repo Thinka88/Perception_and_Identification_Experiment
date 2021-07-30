@@ -1,0 +1,1 @@
+Here, mainly TODOs and questions to be cleared in the process were collected.
