@@ -1,0 +1,218 @@
+---
+title: "XPLab Perception of Randomness Experiment - Statistical Analysis"
+author: "Mara Rehmer"
+date: "1 7 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE, message = FALSE, warning = FALSE, error = FALSE, fig.width = 5, fig.align = "center")
+
+```
+
+```{r libraries, message = FALSE, warning = FALSE, include = FALSE}
+
+# check again, which libraries are really needed
+
+# package for convenience functions (e.g. ggplot2, dplyr, etc.)
+library(tidyverse)
+
+# package for Bayesian regression modeling
+library(brms)
+
+# package for visualization
+library(tidybayes)
+
+# package to visualize 
+library(bayesplot)
+
+# these options help Stan run faster
+options(mc.cores = parallel::detectCores())
+
+#devtools::install_github("michael-franke/aida-package")
+library(aida)
+
+# use the aida-theme for plotting
+theme_set(theme_aida())
+
+# global color scheme / non-optimized
+project_colors = c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#000000")
+
+# setting theme colors globally
+scale_colour_discrete <- function(...) {
+  scale_colour_manual(..., values = project_colors)
+}
+scale_fill_discrete <- function(...) {
+   scale_fill_manual(..., values = project_colors)
+} 
+```
+
+## Loading and inspecting the data
+
+First of all we load the data set and take a look at it.
+
+```{r read_data}
+data <- read_csv("results_271_XPLab+SS21+-+Group+13+-+Pilot_Mara,+Linus,+Cosima,+Katharina.csv")
+glimpse(data)
+```
+First of all we have to exclude test trials. These were the first one after which we shared the link with our pilot participants. Then we had directly two problems with uploading the data to the server, which is why then two of us tried it out again. Meanwhile one set of data points was submitted. This is why we filter out these three trials.
+```{r}
+# exclude test trials
+data <- data %>% 
+  filter(submission_id != 2391, submission_id != 2395, submission_id != 2396)
+```
+
+### Participants
+
+A total of `r data$submission_id %>% unique %>% length` participants took part in an online version of a Perception of Randomness task.
+Participants were (*number of female, male and stuff*), with ages ranging from `r data$age %>% unique %>% min()` to `r data$age %>% unique %>% max()`
+
+
+### General properties and cleaning
+
+We check general properties of the data, like a summary of the reaction time (`RT`) and the overall time spent on the experiment (`timeSpent`).
+
+```{r}
+# check mean time spent
+data %>% 
+  pull(RT) %>% 
+  summary()
+
+# check overall time spent
+data %>% 
+  pull(timeSpent) %>% 
+  summary()
+```
+The overall time spent on the experiment looks fine, but the maximal `RT` is quite high.
+
+Now, we will clean the data by only selecting the columns that are relevant for us and getting rid of outliers.
+First of all we select the columns that are relevant for our analysis:
+`submission_id`: individual identifier of each subject  
+`trial_name`: which we rename to `condition` which is either identification or discrimination  
+`switch_rate`: ranging from 0 to 1 in steps of 0.02 indicating the generating process of the stimuli  
+`correctness`: whether the answer of the participant was correct  
+`RT`: reaction time in ms for each trial (base line is 1500 ms from showing the stimulus)  
+`timeSpent`: overall time spent  
+`age`: age of the participant
+`gender`: gender of the participant
+`languages`: native language of the participant  
+`comments`: question about whether the participant has an idea about what the experiment is about  
+
+
+We choose to exclude individual trials with a reaction time (`RT`) bigger than 8000 ms, because we cannot be sure that participants recall the stimulus correctly after this time and just press any of the keys to continue to the next trial.
+```{r data_wrangling}
+# only include relevant columns
+preprocessed_data <- data %>% 
+  select(submission_id, trial_name, trial_number, switch_rate, correctness, RT, timeSpent, age, gender, languages, comments) %>% 
+  # change trial_name to condition
+  rename(condition = trial_name) %>% 
+  mutate(outlier = case_when(RT > 8000 ~ TRUE,
+                             TRUE ~ FALSE))
+
+```
+
+```{r}
+# look at data points to exclude
+ggplot(data = preprocessed_data, aes(x = trial_number, y = RT)) +
+  geom_point(alpha = 0.2) +
+  geom_point(data = filter(preprocessed_data, outlier == TRUE),
+             color = "firebrick", shape = "square", size = 2)
+
+```
+
+
+```{r}
+# exclude the outliers
+clean_data <- filter(preprocessed_data, outlier == FALSE)
+# number of outliers we exclude
+preprocessed_data$outlier %>% sum()
+```
+We excluded `r preprocessed_data$outlier %>% sum()` trials for having too long reaction times.  
+  
+For now we will only need a few of the columns, so we will create a data set `clean_data` which only includes `experiment_id, condition, switch_rate, and correctness`.
+```{r}
+# make clean data without outliers, RT, timeSpent
+clean_data <- preprocessed_data %>% 
+  select(submission_id, condition, switch_rate, correctness)
+```
+
+### Summary statistics
+Now we will have a look at some summary statistics.
+We create our dependent variable `accuracy` by dummy coding the `correctness` variable and getting the mean for each condition first.
+Then we get the accuracy for each `switch_rate` and `participant`.
+Now we average the mean switch_rate accuracy over all participants and visualize it.
+
+```{r}
+# this is just to have the mean accuracy of each condition at hand
+d <- clean_data %>% 
+  group_by(condition) %>% 
+  mutate(correct_response = ifelse(correctness == 'correct', 1, 0)) %>% 
+  summarize(mean_accuracy = mean(correct_response))
+d
+```
+
+```{r}
+# get overall accuracy for each condition (the same as above)
+clean_data <- clean_data %>% 
+  group_by(condition) %>% 
+  mutate(correct_response = ifelse(correctness == 'correct', 1, 0),
+         condition_accuracy = mean(correct_response)) %>% 
+  ungroup() %>% 
+  # get accuracy for each switch rate and participant individually 
+  group_by(submission_id, switch_rate) %>% 
+  mutate(individual_swr_accuracy = mean(correct_response)) %>% 
+  ungroup() %>% 
+  # average individual switch_rate over all participants
+  group_by(switch_rate) %>% 
+  mutate(average_swr_accuracy = mean(individual_swr_accuracy)) %>% 
+  ungroup()
+  
+```
+
+
+```{r}
+ggplot(data = clean_data, aes(x = switch_rate, y = average_swr_accuracy), group = condition, color = condition) +
+  geom_point(aes(y = individual_swr_accuracy), alpha = 0.01) +
+  # use this to have smooth line
+  geom_smooth(method = "auto") +
+  # use this to have accurate line
+  #geom_line() +
+  # indicator for chance
+  geom_hline(aes(yintercept = 0.5), color = "darkred")
+  # something with facet_grid to display both conditions
+  #facet_grid(condition ~ average_swr_accuracy)
+  
+```
+
+
+
+## Hypothesis
+
+The hypothesis of the original paper states 
+> The probability of correctly identifying stimuli from R [random source] and N [non-random source] coincides with the ease of distinguishing between the two sources.
+
+
+## Analysis
+
+It is a 2x51 mixed factorial design, where the first factor is `condition` with two values *discrimination* or *identification*. The second factor is `switch rate` which has 51 levels. Each participant contributes data points for only one condition (between-subjects) but multiple data points (ideally 10) for each switch rate (within-subject, repeated measures).
+
+We will analyze the `average_swr_accuracy` as dependent variable in terms of the condition and switch rate as independent variables.
+The accuracy is determined as the mean of correct responses for each switch rate. This is calculated for each participant in each condition and then averaged over all participants in the respective condition (as done above).
+In our bayesian regression model we will also include random effects for each participant because the linear regression model assumes that the data points are independent of each other. But each participant contributes multiple data points for each switch rate. 
+
+```{r}
+model <- brm(data = clean_data,
+             seed = 13,
+             # still not sure about those damn random effects
+             formula = average_swr_accuracy ~ condition * switch_rate + (switch_rate || submission_id))
+```
+
+
+
+
+
+
+
+
+
