@@ -54,7 +54,7 @@ function generate_trial_data(){
     var top = new Array(2);
     var expected = '';
     for(let i=0; i<=1; i = Math.round((i +0.02)*100)/100 ){
-        for(let j=0; j<10; j++){
+        for(let j=0; j<1; j++){
             random_sequence = generateSequence(1800,0.5);
             nonrandom_sequence = generateSequence(1800,i);
 
@@ -101,12 +101,12 @@ function generate_trial_data(){
                 }
 
 
-                expected = 'horizontal'
+                expected = 'vertical'
                 if(Math.random()<0.5){
                     ctx.translate(canvas.width/2,canvas.height/2);
                     ctx.rotate(90*Math.PI/180)
                     ctx.drawImage(canvas,-canvas.width/2,-canvas.width/2);
-                    expected = 'vertical'
+                    expected = 'horizontal'
                 }
 
                 var tempCanvas=document.createElement("canvas");
@@ -222,7 +222,6 @@ function generate_trial_data(){
                 var ctx=canvas.getContext('2d');
                 ctx.drawImage(tempCanvas,0,0,cw,ch,0,0,cw*scale,ch*scale);
 
-                console.log(top[0] == nonrandom_sequence)
 
                 if(ori == 'vertical'){
                     trial_data.push({
