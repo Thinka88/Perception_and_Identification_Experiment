@@ -158,7 +158,6 @@ We think that we have to make `switch_rate` an ordered factor and also treat it 
 ```{r}
 # make switch rate ordered factor
 clean_data$switch_rate <- clean_data$switch_rate %>% 
-  as.character() %>% 
   factor(ordered = TRUE)
 ```
 
@@ -288,15 +287,20 @@ It is a 2x51 mixed factorial design, where the first factor is `condition` with 
 
 We will analyze the `average_swr_accuracy` as dependent variable in terms of the condition and switch rate as independent variables.
 The accuracy is determined as the mean of correct responses for each switch rate. This is calculated for each participant in each condition and then averaged over all participants in the respective condition (as done above).
-In our bayesian regression model we will also include random effects for each participant because the linear regression model assumes that the data points are independent of each other. But each participant contributes multiple data points for each switch rate. 
+In our bayesian regression model we also want to include random effects for each participant because the linear regression model assumes that the data points are independent of each other. But each participant contributes multiple data points for each switch rate. But we are not sure about them. 
 
 ```{r}
-model <- brm(data = clean_data,
-             seed = 12,
+model_1 <- brm(data = clean_data,
+             seed = 13,
              # not sure about the random effects
-             formula = average_swr_accuracy ~ condition * switch_rate)
-model
+             formula = average_swr_accuracy ~ condition + switch_rate + (1|submission_id)
+             )
+model_1
 ```
+Looking at the results there are many parameters. We are not sure why the first three switch_rates are labeled with L, Q, and C.
+We tried the same model with added random effects (switch_rate || submission_id) but the model did not converge at all.
+Looking at the Rhat value for family specific parameters and the group level effects we can see that the model did not converge for them.
+The credible interval for `conditionidentification` ranges from -0.14 to 0.31, that includes zero, so for the amount of data so far, we cannot say that there is a credible difference between the two conditions.
 
 
 
