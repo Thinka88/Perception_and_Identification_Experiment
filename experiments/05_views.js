@@ -34,7 +34,7 @@ const intro = magpieViews.view_generator("intro", {
             Das Experiment wird ca. eine halbe Stunde dauern. Nimm dir also bitte diese Zeit und stell sicher, dass du nicht gestört wirst.
             Für jede*n Teilnehmer*in wird eine zufällige Identifikationsnummer gewählt, die keine Rückschlüsse auf deine Person zulässt.
             Das Experiment ist also anonym.
-            Falls du normalerweise eine Brille (oder andere Sehhilfe) benötigst, um auf deinem Bildschirm zu lesen, setzte diese bitte auf.
+            Falls du normalerweise eine Brille (oder andere Sehhilfe) benötigst, um auf deinem Bildschirm zu lesen, setze diese bitte auf.
             <br />
             <br />
             Nachfolgend bekommst du Instruktionen, die dir erklären, was du in diesem Experiment zu tun hast. Daraufhin wird das Experiment gestartet.
@@ -58,7 +58,7 @@ const intro = magpieViews.view_generator("intro", {
             If you usually wear glasses (or other visual aid) when working on your screen, please put them on.
             <br/ >
             <br/ >
-            Following, you will get instructions on what to do in this experiment. After that, the experiment is started.
+            Following this, you will get instructions on what to do in this experiment. After that, the experiment is started.
             Try to answer as correctly as possible. After you have finished all trials, we will ask for some additional
             information which is optional but helps us with analyzing the results. Afterwards press the 'next'-button inorder to upload your data.
             Please don't close the browser window until we ask you to.`,
