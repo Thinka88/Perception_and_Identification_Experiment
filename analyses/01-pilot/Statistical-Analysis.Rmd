@@ -267,13 +267,13 @@ ggplot(data = clean_data, aes(x = switch_rate, y = average_swr_accuracy)) +
   #facet_wrap(~ condition, ncol = 1)
   
 ```
+
 ```{r}
-clean_data$condition_accuracy %>% unique()
+#clean_data$condition_accuracy %>% unique()
+unique(clean_data$condition_accuracy)[2]
 ```
 This looks a lot more plausible. We can now continue.
-```{r}
-clean_data$submission_id %>% unique()
-```
+
 
 ## Hypothesis
 
@@ -302,7 +302,74 @@ We tried the same model with added random effects (switch_rate || submission_id)
 Looking at the Rhat value for family specific parameters and the group level effects we can see that the model did not converge for them.
 The credible interval for `conditionidentification` ranges from -0.14 to 0.31, that includes zero, so for the amount of data so far, we cannot say that there is a credible difference between the two conditions.
 
+Generally, we are not sure, whether the model above is even fitting for our "problem". 
+We also had the idea to use a logistic regression model since `correctness` is a binary variable and accuracy depends on it. The one we use below does not account for the within subject factor `switch_rate`, because we don't know how to include it, or if that is even possible/necessary.
+We use weakly informative priors class b coefficients, precisely student_t distribution with $\mu = 0, \sigma = 1, \nu = 1$.
+
+
+```{r}
+logistic_regression <- brm(
+  seed = 13,
+  formula = correctness ~ condition,
+  family = bernoulli(link = "logit"),
+  data = clean_data %>% 
+    mutate(correctness = correctness == 'correct'),
+  prior = prior(student_t(1, 0, 1), class = 'b'), 
+  sample_prior = 'yes',
+  iter = 20000)
+```
+
+
+```{r}
+pp_check(logistic_regression)
+```
+
+```{r}
+logistic_regression
+```
+```{r}
+# predictor of central tendency
+logistic <- function(x){
+  return((1+exp(-x))^-1)
+}
+
+intercept <- fixef(logistic_regression)[1,1]
+conditionIdentification <- fixef(logistic_regression)[2,1]
+
+estimates <- tribble(~estimates_from, ~discrimination, ~identification,
+                     "model", logistic(intercept), logistic(intercept+conditionIdentification),
+                     "data", unique(clean_data$condition_accuracy)[1], unique(clean_data$condition_accuracy)[2]
+                     )
+estimates
+
+```
+
+The pp_check seems to be fitting. And also the linear predictors when transformed to central predictors seem reasonable.
+Now we test the hypothesis that the condition has no effect on the probability of correctly identifying the different stimuli.
+
+```{r}
+brms::hypothesis(logistic_regression, "conditionidentification = 0")
+```
+
+For the point-valued hypothesis the value of the estimate and the corresponding 95% credible interval are all negative numbers. The evidence ratio (Bayes factor) is 0.19 and the posterior probability that the hypothesis is true is 0.16 given the data and the model. The star indicates that the value tested against lies outside the 95%-CI, which is why we reject the hypothesis.
+
+
+```{r}
+brms::hypothesis(logistic_regression, "conditionidentification < 0")
+```
+For this one-sided hypothesis that accuracy in the identification condition is lower than in the discrimination condition, the evidence ratio (posterior odds) are 85.21 and the posterior probability exceeds 95%, which is why this hypothesis is more likely to be true given the model and the data.
 
 
 
+In this model below we tried to incorporate the switch_rate but the session always crashes.
+```{r}
+#glm_logistic_regression_w_swr <- brm(
+#  formula = correctness ~ condition + switch_rate,
+#  family = bernoulli(link = "logit"),
+#  data = clean_data %>% 
+#    mutate(correctness = correctness == 'correct'),
+#  prior = prior(student_t(1, 0, 1), class = 'b'),
+#  sample_prior = 'yes',
+#  iter = 20000)
+```
 
