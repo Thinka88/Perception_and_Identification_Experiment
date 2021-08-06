@@ -56,11 +56,9 @@ function generate_trial_data_practice(){
     for(let i=0; i<=1; i = Math.round((i +0.02)*100)/100){
         switch_rates.push(i);
     }
-    console.log(switch_rates)
 
     for(let i=0; i<10; i++){
         switch_rate = _.sample(switch_rates)
-        console.log(switch_rate)
         random_sequence = generateSequence(1800,0.5);
         nonrandom_sequence = generateSequence(1800,switch_rate);
 
