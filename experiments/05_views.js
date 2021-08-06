@@ -34,7 +34,7 @@ const intro = magpieViews.view_generator("intro", {
             Das Experiment wird ca. eine halbe Stunde dauern. Nimm dir also bitte diese Zeit und stell sicher, dass du nicht gestört wirst.
             Für jede*n Teilnehmer*in wird eine zufällige Identifikationsnummer gewählt, die keine Rückschlüsse auf deine Person zulässt.
             Das Experiment ist also anonym.
-            Falls du normalerweise eine Brille (oder andere Sehhilfe) benötigst, um auf deinem Bildschirm zu lesen, setze diese bitte auf.
+            Falls du normalerweise eine Brille (oder andere Sehhilfe) benötigst, um auf deinem Bildschirm zu lesen, setzte diese bitte auf.
             <br />
             <br />
             Nachfolgend bekommst du Instruktionen, die dir erklären, was du in diesem Experiment zu tun hast. Daraufhin wird das Experiment gestartet.
@@ -58,7 +58,7 @@ const intro = magpieViews.view_generator("intro", {
             If you usually wear glasses (or other visual aid) when working on your screen, please put them on.
             <br/ >
             <br/ >
-            Following this, you will get instructions on what to do in this experiment. After that, the experiment is started.
+            Following, you will get instructions on what to do in this experiment. After that, the experiment is started.
             Try to answer as correctly as possible. After you have finished all trials, we will ask for some additional
             information which is optional but helps us with analyzing the results. Afterwards press the 'next'-button inorder to upload your data.
             Please don't close the browser window until we ask you to.`,
@@ -177,12 +177,12 @@ const thanks = magpieViews.view_generator("thanks", {
 
 
 // Here, we initialize a normal forced_choice view
-const discrimination = magpieViews.view_generator("key_press", {
+const discrimination_main = magpieViews.view_generator("key_press", {
   // This will use all trials specified in `data`, you can user a smaller value (for testing), but not a larger value
-  trials: trial_info.key_press.length,
+  trials: trial_info.key_press_main.length,
   // name should be identical to the variable name
-  name: 'discrimination',
-  data: _.shuffle(trial_info.key_press),
+  name: 'discrimination_main',
+  data: _.shuffle(trial_info.key_press_main),
   stim_duration: 1500
   // you can add custom functions at different stages through a view's life cycle
   // hook: {
@@ -190,12 +190,40 @@ const discrimination = magpieViews.view_generator("key_press", {
   // }
 });
 
-const identification = magpieViews.view_generator("key_press", {
+const discrimination_practice = magpieViews.view_generator("key_press", {
   // This will use all trials specified in `data`, you can user a smaller value (for testing), but not a larger value
-  trials: trial_info.key_press.length,
+  trials: trial_info.key_press_practice.length,
   // name should be identical to the variable name
-  name: 'identification',
-  data: _.shuffle(trial_info.key_press),
+  name: 'discrimination',
+  data: _.shuffle(trial_info.key_press_practice),
+  stim_duration: 1500
+  // you can add custom functions at different stages through a view's life cycle
+  // hook: {
+  //     after_response_enabled: check_response
+  // }
+});
+
+
+
+const identification_main = magpieViews.view_generator("key_press", {
+  // This will use all trials specified in `data`, you can user a smaller value (for testing), but not a larger value
+  trials: trial_info.key_press_main.length,
+  // name should be identical to the variable name
+  name: 'identification_main',
+  data: _.shuffle(trial_info.key_press_main),
+  stim_duration: 1500
+  // you can add custom functions at different stages through a view's life cycle
+  // hook: {
+  //     after_response_enabled: check_response
+  // }
+});
+
+const identification_practice = magpieViews.view_generator("key_press", {
+  // This will use all trials specified in `data`, you can user a smaller value (for testing), but not a larger value
+  trials: trial_info.key_press_practice.length,
+  // name should be identical to the variable name
+  name: 'identification_practice',
+  data: _.shuffle(trial_info.key_press_practice),
   stim_duration: 1500
   // you can add custom functions at different stages through a view's life cycle
   // hook: {

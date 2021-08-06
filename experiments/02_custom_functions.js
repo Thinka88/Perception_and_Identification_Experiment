@@ -48,13 +48,223 @@ function generateSequence(length, switch_rate){
     return sequence;
 }
 
-function generate_trial_data(){
+function generate_trial_data_practice(){
+    var trial_data = new Array();
+    var top = new Array(2);
+    var expected = '';
+    var switch_rates = new Array(51);
+    for(let i=0; i<=1; i = Math.round((i +0.02)*100)/100){
+        switch_rates.push(i);
+    }
+
+    for(let i=0; i<10; i++){
+        switch_rate = _.sample(switch_rates)
+        random_sequence = generateSequence(1800,0.5);
+        nonrandom_sequence = generateSequence(1800,i);
+
+
+
+
+        if(Math.random() < 0.5){
+            top = [random_sequence, nonrandom_sequence]
+        }else{
+            top = [nonrandom_sequence, random_sequence]
+        }
+
+        if(coin == 'discrimination'){
+            var canvas = document.createElement('canvas');
+            canvas.width = 60;
+            canvas.height = 60;
+            var ctx = canvas.getContext('2d');
+            var sequence_counter = 0
+            for(x = 0; x < canvas.height/2; x++){
+                for(y = 0; y < canvas.width; y++){
+                    if(top[0][sequence_counter] == 0){
+                        ctx.fillStyle = "rgb(0,109,160)";
+                        ctx.fillRect( x, y, 1, 1 );
+                    }else{
+                        ctx.fillStyle = "rgb(200,81,0)";
+                        ctx.fillRect( x, y, 1, 1 );
+                    }
+                    sequence_counter++;;
+                }
+            }
+
+            sequence_counter = 0;
+            for(x = canvas.height/2; x<canvas.height; x++){
+                for(y = 0; y<canvas.width; y++){
+                    if(top[1][sequence_counter] == 0){
+                        ctx.fillStyle = "rgb(0,109,160)";
+                        ctx.fillRect( x, y, 1, 1 );
+                    }else{
+                        ctx.fillStyle = "rgb(200,81,0)";
+                        ctx.fillRect( x, y, 1, 1 );
+                    }
+                    sequence_counter++;
+                }
+            }
+
+
+            expected = 'vertical'
+            if(Math.random()<0.5){
+                ctx.translate(canvas.width/2,canvas.height/2);
+                ctx.rotate(90*Math.PI/180)
+                ctx.drawImage(canvas,-canvas.width/2,-canvas.width/2);
+                expected = 'horizontal'
+            }
+
+            var tempCanvas=document.createElement("canvas");
+            var tctx=tempCanvas.getContext("2d");
+
+            var scale = 4
+            var cw=canvas.width;
+            var ch=canvas.height;
+            tempCanvas.width=cw;
+            tempCanvas.height=ch;
+            tctx.drawImage(canvas,0,0);
+            canvas.width*=scale;
+            canvas.height*=scale;
+            var ctx=canvas.getContext('2d');
+            ctx.drawImage(tempCanvas,0,0,cw,ch,0,0,cw*scale,ch*scale);
+
+
+            trial_data.push({
+                question: 'Kann die Matrix horizontal oder vertikal getrennt werden? / Can the matrix be devided horizontally or vertically?',
+                key1: 'v',
+                key2: 'h',
+                v: 'vertical',
+                h: 'horizontal',
+                expected: expected,
+                picture: canvas.toDataURL(),
+                switch_rate : i
+            });
+
+        }else{
+            var canvas = document.createElement('canvas');
+            canvas.width = 60;
+            canvas.height = 110;
+            var ctx = canvas.getContext('2d');
+            var sequence_counter = 0
+
+            ori = 'horizontal'
+            if(Math.random()<0.5){
+                canvas.width = 110;
+                canvas.height = 60;
+                for(x = 0; x < (canvas.width-50)/2; x++){
+                    for(y = 0; y < canvas.height; y++){
+                        if(top[0][sequence_counter] == 0){
+                            ctx.fillStyle = "rgb(0,109,160)";
+                            ctx.fillRect( x, y, 1, 1 );
+                        }else{
+                            ctx.fillStyle = "rgb(200,81,0)";
+                            ctx.fillRect( x, y, 1, 1 );
+                        }
+                        sequence_counter++;;
+                    }
+                }
+
+                sequence_counter = 0;
+                for(x = canvas.width-30; x<canvas.width; x++){
+                    for(y = 0; y<canvas.height; y++){
+                        if(top[1][sequence_counter] == 0){
+                            ctx.fillStyle = "rgb(0,109,160)";
+                            ctx.fillRect( x, y, 1, 1 );
+                        }else{
+                            ctx.fillStyle = "rgb(200,81,0)";
+                            ctx.fillRect( x, y, 1, 1 );
+                        }
+                        sequence_counter++;
+                    }
+                }
+                ori = 'vertical'
+            }else{
+                for(y = 0; y < (canvas.height-50)/2; y++){
+                    for(x = 0; x < canvas.width; x++){
+                        if(top[0][sequence_counter] == 0){
+                            ctx.fillStyle = "rgb(0,109,160)";
+                            ctx.fillRect( x, y, 1, 1 );
+                        }else{
+                            ctx.fillStyle = "rgb(200,81,0)";
+                            ctx.fillRect( x, y, 1, 1 );
+                        }
+                        sequence_counter++;;
+                    }
+                }
+
+                sequence_counter = 0;
+                for(y = canvas.height-30; y<canvas.height; y++){
+                    for(x = 0; x<canvas.width; x++){
+                        if(top[1][sequence_counter] == 0){
+                            ctx.fillStyle = "rgb(0,109,160)";
+                            ctx.fillRect( x, y, 1, 1 );
+                        }else{
+                            ctx.fillStyle = "rgb(200,81,0)";
+                            ctx.fillRect( x, y, 1, 1 );
+                        }
+                        sequence_counter++;
+                    }
+                }
+
+            }
+
+
+
+
+
+            var tempCanvas=document.createElement("canvas");
+            var tctx=tempCanvas.getContext("2d");
+
+
+            var scale = 3
+            var cw=canvas.width;
+            var ch=canvas.height;
+            tempCanvas.width=cw;
+            tempCanvas.height=ch;
+            tctx.drawImage(canvas,0,0);
+            canvas.width*=scale;
+            canvas.height*=scale;
+            var ctx=canvas.getContext('2d');
+            ctx.drawImage(tempCanvas,0,0,cw,ch,0,0,cw*scale,ch*scale);
+
+            if(ori == 'vertical'){
+                trial_data.push({
+                question: 'Welche Matrix wurde zufällig erzeugt? / Which matrix is randomly generated?',
+                key1 : 'a',
+                key2 : 'd',
+                'a' : 'links/left',
+                'd' : 'rechts/right',
+                expected: (top[0] == random_sequence ? 'links/left' : 'rechts/right'),
+                picture: canvas.toDataURL(),
+                switch_rate : i
+                })
+            }else{
+                trial_data.push({
+                    question: 'Welche Matrix wurde zufällig erzeugt? / Which matrix is randomly generated?',
+                    key1 : 'w',
+                    key2 : 's',
+                    'w' : 'oben/up',
+                    's' : 'unten/down',
+                    expected: (top[0] == random_sequence ? 'oben/up' : 'unten/down'),
+                    picture: canvas.toDataURL(),
+                    switch_rate : i
+                })
+
+
+            }
+        }
+    
+    }
+
+    return trial_data;
+}
+
+function generate_trial_data_main(){
 
     var trial_data = new Array();
     var top = new Array(2);
     var expected = '';
     for(let i=0; i<=1; i = Math.round((i +0.02)*100)/100 ){
-        for(let j=0; j<1; j++){
+        for(let j=0; j<6; j++){
             random_sequence = generateSequence(1800,0.5);
             nonrandom_sequence = generateSequence(1800,i);
 
@@ -221,7 +431,6 @@ function generate_trial_data(){
                 canvas.height*=scale;
                 var ctx=canvas.getContext('2d');
                 ctx.drawImage(tempCanvas,0,0,cw,ch,0,0,cw*scale,ch*scale);
-
 
                 if(ori == 'vertical'){
                     trial_data.push({

@@ -16,13 +16,13 @@ $("document").ready(function() {
         // You have to specify all views you want to use in this experiment and the order of them
         views_seq: [
             intro,
-            ... coin == 'discrimination' ? [instructions_discrimination,discrimination] : [instructions_identification,identification],
+            ... coin == 'discrimination' ? [instructions_discrimination,discrimination_practice,discrimination_main] : [instructions_identification,identification_practice,identification_main],
             post_test,
             thanks,
         ],
         // Here, you can specify all information for the deployment
         deploy: {
-            experimentID: "276",
+            experimentID: "271",
             serverAppURL: "https://magpie-demo.herokuapp.com/api/submit_experiment/",
             // Possible deployment methods are:
             // "debug" and "directLink"
@@ -35,7 +35,8 @@ $("document").ready(function() {
         progress_bar: {
             in: [
                 // list the view-names of the views for which you want a progress bar
-                coin == 'discrimination' ? discrimination.name : identification.name,
+                coin == 'discrimination' ? discrimination_practice.name : identification_practice.name,
+                coin == 'discrimination' ? discrimination_main.name : identification_main.name,
             ],
              // Possible styles are "default", "separate" and "chunks"
             style: "separate",
