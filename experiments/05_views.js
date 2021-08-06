@@ -143,7 +143,7 @@ const instructions_identification_main = magpieViews.view_generator("instruction
          <br />
          <br />
           Now starts the main part of the experiment. You can take a break now and start when ever you are ready.
-          Klick the button below to start`
+          Klick the button below to start`,
   buttonText: 'Starte das Hauptexperiment / begin the main experiment'
 });
 
