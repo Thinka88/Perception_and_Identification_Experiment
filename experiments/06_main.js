@@ -16,7 +16,7 @@ $("document").ready(function() {
         // You have to specify all views you want to use in this experiment and the order of them
         views_seq: [
             intro,
-            ... coin == 'discrimination' ? [instructions_discrimination,discrimination_practice,discrimination_main] : [instructions_identification,identification_practice,identification_main],
+            ... coin == 'discrimination' ? [instructions_discrimination_practice,discrimination_practice,instructions_discrimination_main,discrimination_main] : [instructions_identification_practice,identification_practice,instructions_identification_main,identification_main],
             post_test,
             thanks,
         ],

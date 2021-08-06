@@ -66,7 +66,7 @@ const intro = magpieViews.view_generator("intro", {
 });
 
 // For most tasks, you need instructions views
-const instructions_discrimination = magpieViews.view_generator("instructions", {
+const instructions_discrimination_practice = magpieViews.view_generator("instructions", {
   trials: 1,
   name: 'instructions',
   title: 'Instruktionen | Instructions',
@@ -75,6 +75,8 @@ const instructions_discrimination = magpieViews.view_generator("instructions", {
         Die beiden Hälften werden aus unterschiedlichen Prozessen erzeugt.
         Deine Aufgabe besteht darin, die Ausrichtung der Grenze zwischen den beiden Hälften zu beurteilen, indem du die <strong>'v' Taste</strong> für vertikal oder die <strong>'h' Taste</strong> für horizontal drücken.
         Bitte drücke erst eine Taste, wenn das Bild nicht mehr zu sehen ist.
+        Um dich mit der Aufgabe vertraut zu machen beginnen wir mit 10 Übungsdurchläufen.
+        Wir werden dir genau mitteilen wann das Hauptexperiment startet.
         <br/ >
         <br/ >
         In each trial of the experiment you will see a square made up of two colours.
@@ -82,11 +84,26 @@ const instructions_discrimination = magpieViews.view_generator("instructions", {
         The two halves are generated from different processes.
         Your task is to judge the orientation of the boundary between the two halves, by pressing <strong>'v' key</strong> for vertical or <strong>'h' key</strong> for horizontal.
         Please press the respective key when the picture is gone.
+        Before we start there will be 10 practice trials, so you can familiarize yourself with the task.
+        We will tell you exactly when the main experiment starts.
 `,
-  buttonText: 'starte das Experiment / begin the experiment'
+  buttonText: 'starte die Übung / begin the practice '
 });
 
-const instructions_identification = magpieViews.view_generator("instructions", {
+const instructions_discrimination_main = magpieViews.view_generator("instructions", {
+  trials: 1,
+  name: 'instructions',
+  title: 'Beginn des Hauptexperiments | Start of Main Experiment',
+  text: `Ab jetzt startet das Hauptexperiment. Du kannst eine kleine Pause machen und starten wenn du bereit bist.
+         Bitte drücke die Taste unten um zu starten.
+         <br />
+         <br />
+          Now starts the main part of the experiment. You can take a break now and start when ever you are ready.
+          Klick the button below to start`,
+  buttonText: 'Starte das Hauptexperiment / begin the main experiment'
+});
+
+const instructions_identification_practice = magpieViews.view_generator("instructions", {
   trials: 1,
   name: 'instructions',
   title: 'Instruktionen | Instructions',
@@ -98,6 +115,8 @@ const instructions_identification = magpieViews.view_generator("instructions", {
         Deine Aufgabe besteht darin, zu identifizieren, welche Hälfte eher durch einen <strong>zufälligen</strong> Prozess erzeugt wird als durch einen nicht-zufälligen Prozess.
         Drücke die <strong>'w' Taste (oben) oder 's' Taste (unten)</strong>, wenn die Teilung horizontal ist, und nach <strong>'a' Taste (links) oder 'd' Taste (rechts)</strong>, wenn sie vertikal ist.
         Bitte drücke erst eine Taste, wenn das Bild nicht mehr zu sehen ist.
+        Um dich mit der Aufgabe vertraut zu machen beginnen wir mit 10 Übungsdurchläufen.
+        Wir werden dir genau mitteilen wann das Hauptexperiment startet.
         <br/ >
         <br/ >
         In each trial of the experiment you will see a square made up of two colours.
@@ -108,9 +127,24 @@ const instructions_identification = magpieViews.view_generator("instructions", {
         Your task is to identify which half is more likely to be produced by a <strong>random</strong> process than a nonrandom process.
         Press the <strong>'w' key (up) oder 's' key (down)</strong> if the division is horizontal, and <strong>'a' key (left) oder 'd' key (right)</strong> if vertical.
         Please press the respective key when the picture is gone.
+        Before we start there will be 10 practice trials, so you can familiarize yourself with the task.
+        We will tell you exactly when the main experiment starts.
 
 `,
-  buttonText: 'starte das Experiment / begin the experiment'
+  buttonText: 'starte die Übung / begin the practice'
+});
+
+const instructions_identification_main = magpieViews.view_generator("instructions", {
+  trials: 1,
+  name: 'instructions',
+  title: 'Beginn des Hauptexperiments | Start of Main Experiment',
+  text: `Ab jetzt startet das Hauptexperiment. Du kannst eine kleine Pause machen und starten wenn du bereit bist.
+         Bitte drücke die Taste unten um zu starten.
+         <br />
+         <br />
+          Now starts the main part of the experiment. You can take a break now and start when ever you are ready.
+          Klick the button below to start`
+  buttonText: 'Starte das Hauptexperiment / begin the main experiment'
 });
 
 // In the post test questionnaire you can ask your participants addtional questions
