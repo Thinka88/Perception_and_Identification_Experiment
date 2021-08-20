@@ -1,0 +1,407 @@
+---
+title: "Pilot Analysis"
+author: "Mara Rehmer"
+date: "6 8 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, cache = FALSE, message = FALSE, warning = FALSE, error = FALSE, fig.width = 12, fig.height = 5, fig.align = "center")
+
+```
+
+```{r libraries, message = FALSE, warning = FALSE, include = FALSE}
+
+# check again, which libraries are really needed
+
+# package for convenience functions (e.g. ggplot2, dplyr, etc.)
+library(tidyverse)
+
+# package for Bayesian regression modeling
+library(brms)
+
+# package for visualization
+library(tidybayes)
+
+# package to visualize 
+library(bayesplot)
+
+# these options help Stan run faster
+options(mc.cores = parallel::detectCores())
+
+#devtools::install_github("michael-franke/aida-package")
+library(aida)
+
+# use the aida-theme for plotting
+theme_set(theme_aida())
+
+# global color scheme / non-optimized
+project_colors = c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#000000")
+
+# setting theme colors globally
+scale_colour_discrete <- function(...) {
+  scale_colour_manual(..., values = project_colors)
+}
+scale_fill_discrete <- function(...) {
+   scale_fill_manual(..., values = project_colors)
+} 
+```
+
+## Loading and inspecting the data
+
+First of all we load the data set and take a look at it.
+
+```{r read_data}
+data <- read_csv("results_271_XPLab+SS21+-+Group+13+-+Pilot_Mara,+Linus,+Cosima,+Katharina.csv")
+glimpse(data)
+```
+
+Now, we have to exclude test trials. These were the first one after which we shared the link with our pilot participants. Then we had directly two problems with uploading the data to the server, which is why then two of us tried it out again. Meanwhile one set of data points was submitted. This is why we filter out the three trials with submission id 2391, 2395 and 2396.
+```{r exclude_test}
+# exclude test trials
+data <- data %>% 
+  filter(submission_id != 2391, submission_id != 2395, submission_id != 2396)
+```
+
+### Participants
+
+```{r participant_summary}
+# We will get a quick overview of the condition the participants took part in and their gender and age
+d_summary <- data %>% 
+  group_by(submission_id) %>% 
+  summarize(gender = unique(gender),
+            condition = unique(trial_name),
+            age = unique(age),
+            language = unique(languages))
+```
+
+A total of `r d_summary$submission_id %>% length` participants took part in an online version of a Perception of Randomness task.
+There were `r sum(d_summary$gender == 'male')` male, `r sum(d_summary$gender == 'female')` female and `r sum(d_summary$gender == 'other')` other participants, with ages ranging from `r d_summary$age %>% unique %>% min()` to `r d_summary$age %>% unique %>% max()`. 
+
+### General properties and cleaning
+
+First we have a look at the comments which were answers to our question whether the participant had any idea what this experiment is about.
+
+```{r comments}
+# look at the comments
+data$comments %>% unique
+```
+The second answer is going into the right direction, because we are actually going to analyze the accuracy or proportion of correct answers for all different levels of switch rate (more on this below). We can see that none of the participants wrote down "randomness".  
+  
+We check general properties of the data, like a summary of the reaction time (`RT`) and the overall time spent on the experiment (`timeSpent`).
+```{r time_check}
+# check mean time spent
+print("Summary of RT")
+data %>% 
+  pull(RT) %>% 
+  summary()
+
+print("Summary of time spent")
+# check overall time spent
+data %>% 
+  pull(timeSpent) %>% 
+  summary()
+```
+
+The overall time spent on the experiment looks fine, but the maximal `RT` is quite high.  
+  
+We will clean the data by only selecting the columns that are relevant for us and get rid of outliers.
+First of all we select the columns that are relevant for our analysis:  
+`submission_id`: individual identifier of each subject  
+`trial_name`: which we rename to `condition` which is either identification or discrimination  
+`trial_number`: number of trial (used for plotting the outliers)  
+`switch_rate`: ordered factor ranging from 0 to 1 in steps of 0.02 indicating the generating process of the stimuli (named `swr`)  
+`correctness`: whether the answer of the participant was correct  
+`RT`: reaction time in ms for each trial (base line is 1500 ms from showing the stimulus)  
+`timeSpent`: overall time spent  
+  
+We choose to exclude individual trials with a reaction time (`RT`) bigger than 8000 ms, because we cannot be sure that participants recall the stimulus correctly after this time and just press any of the keys to continue to the next trial. We don't exclude "too fast" reaction times because answers can only be entered after the stimulus was shown for 1500 ms.
+We make `swr` (switch rate) an unordered factor and have a look at which data points do not fulfill our time limits and therefore qualify as outliers.
+```{r data_wrangling}
+# only include relevant columns
+preprocessed_data <- data %>% 
+  select(submission_id, trial_name, trial_number, switch_rate, correctness, RT, timeSpent) %>% 
+  # change trial_name to condition
+  rename(condition = trial_name) %>%
+  rename(swr = switch_rate) %>% 
+  mutate(outlier = case_when(RT > 8000 ~ TRUE,
+                             TRUE ~ FALSE))
+
+```
+
+```{r swr_factor}
+# make switch rate a factor
+preprocessed_data$swr <- preprocessed_data$swr %>% 
+  factor(ordered = FALSE) 
+```
+
+```{r outlier_plot}
+# look at data points to exclude
+ggplot(data = preprocessed_data, aes(x = trial_number, y = RT)) +
+  geom_point(alpha = 0.2) +
+  geom_point(data = filter(preprocessed_data, outlier == TRUE),
+             color = "#E69F00", shape = 18, size = 4) +
+  labs(title = "Outliers")
+
+```
+We excluded `r preprocessed_data$outlier %>% sum()` trials for having too long reaction times.
+
+```{r outlier_exclude}
+# exclude the outliers
+preprocessed_data <- filter(preprocessed_data, outlier == FALSE)
+```
+  
+   
+Now we only need a few of the columns, so we create a data set `clean_data` which includes `experiment_id, condition, swr, and correctness`.
+```{r clean_data}
+# make clean data without outliers, RT, timeSpent
+clean_data <- preprocessed_data %>% 
+  select(submission_id, condition, swr, correctness)
+```
+
+### Summary statistics
+
+We will have a look at some summary statistics like the mean accuracy for both conditions. 
+
+```{r first_accuracy}
+# this is just to have the mean accuracy of each condition at hand
+d <- clean_data %>% 
+  group_by(condition) %>% 
+  mutate(correct_response = ifelse(correctness == 'correct', 1, 0)) %>% 
+  summarize(mean_accuracy = mean(correct_response))
+d
+```
+
+Looking at the mean accuracy of both conditions we see that something must have went wrong. (We find out that we mixed up correct and incorrect in the experiment coding, the last pilot submission was done when this was already fixed). Now we fix this mistake so we do not lose the data.
+
+```{r fixing_error}
+# fix our error by taking the three participants and inversing their accuracy
+clean_data_fixing_our_error <- clean_data %>% 
+  filter(submission_id == 2394 | submission_id == 2398 | submission_id == 2400) %>% 
+  mutate(correctness = ifelse(correctness == 'correct', 'incorrect', 'correct'))
+
+# all of the data collected after we fixed our error
+clean_data <- clean_data %>% 
+  filter(submission_id != 2394, submission_id != 2398, submission_id != 2400)
+```
+
+```{r join_data}
+clean_data <- full_join(clean_data_fixing_our_error, clean_data)
+```
+We look at mean accuracy for each condition again:
+
+```{r second_accuracy}
+d2 <- clean_data %>% 
+  group_by(condition) %>% 
+  mutate(correct_response = ifelse(correctness == 'correct', 1, 0)) %>% 
+  summarize(mean_accuracy = mean(correct_response))
+d2
+```
+These results seem to be more realistic.
+
+```{r correct_response}
+clean_data <- clean_data %>% 
+  # code correct response as binary numeric variable 
+  mutate(correct_response = ifelse(correctness == 'correct', 1, 0))
+```
+
+We also have a look at each participants individual accuracy.
+```{r indiv_accuracy}
+indiv_acc <- clean_data %>% 
+  group_by(submission_id) %>% 
+  summarize(individual_accuracy = mean(correct_response),
+            condition = unique(condition))
+indiv_acc
+```
+While three of the participants have very similar values, the fourth (submission_id 2400) was clearly better at the task. This is why the over all accuracy is higher in the discrimination condition.
+
+## Hypothesis
+
+The hypothesis of the original paper states  
+
+>The probability of correctly identifying stimuli from R [random source] and N [non-random source] coincides with the ease of distinguishing between the two sources.
+
+Or in other words: The proportion of correct answers for both conditions is not significantly different.
+
+## Analysis
+
+It is a 2x51 mixed factorial design, where the first factor is `condition` with two values *discrimination* or *identification*. The second factor is `switch rate` which has 51 levels (from 0 to 1 in steps of 0.02). Each participant contributes data points for only one condition (between-subjects) but multiple data points (ideally 10) for each switch rate (within-subject, repeated measures).
+
+We use a Bayesian Logistic Regression Model which models the `correctness` as dependent variable in terms of `condition` and `switch_rate` as independent variables. We choose this as a measure of proportion of correct responses in each condition and switch rate instead of a beforehand calculated summary statistic like accuracy which was used in the original paper.
+We choose not to average over all participants and switch rates in the two condition because this summary of the data will lead our model to underestimate the variance in the data.
+
+We also include random slopes for each participant because the model assumes that the data points are independent of each other. But each participant contributes data points for each switch rate.   
+We will use weakly informative priors for all `class b` parameters, namely student_t(1, 0, 2) prior distribution, because they speed up the sampling. We run 5000 iterations and set a seed (13).
+
+```{r model, cache=TRUE}
+# fit the model now to give estimates of correct response
+logistic_regression <- brm(data = clean_data %>% 
+                 mutate(correctness = correctness == 'correct'),
+               formula = correctness ~ condition * swr + (1|submission_id),
+               family = bernoulli(link = "logit"),
+               prior = set_prior("student_t(1, 0, 2)", class = 'b'),
+               sample_prior = 'yes',
+               iter = 5000,
+               seed = 13
+               )
+logistic_regression
+```
+
+The `Intercept`, or base level estimate for switch rate = 0 in the discrimination condition, is 2.46 (corresponding to a proportion of correct answers of approx. 0.92), the 95% Credible Interval (CI) is quite large [0.74, 2.76]. The estimate for `conditionidentification` is 0.04 and the 95% CI ranges from [-1.67, 1.66] which is why we cannot draw any conclusion from it right now. This can be due to little data. Only some levels of `swr` and the interaction terms between `conditionidentification:swr` are meaningful right now (because their CI does not include zero). We can see that the estimates for switch rates = 0.42 to switch rate = 0.6 are negative, so the proportion of correct answers goes down. This makes sense because switch rates closer to 0.5 are less easy to tell apart in both conditions from the random half. For switch rates 0.62 to 0.66 the interaction estimates are credibly below zero meaning that there were more mistakes made in the identification condition for these switch rates.  
+We can also see that there is substantial variability across the participants (`submission_id`) with an estimate of 0.8. 
+
+```{r pp_check, cache=TRUE}
+pp_check(logistic_regression, nsamples = 100)
+```
+Looking at the `pp_check` we can see that the model neatly captures the nature of our data.
+
+```{r spread_draws, cache=TRUE}
+# predictor of central tendency
+logistic <- function(x){
+  return((1+exp(-x))^-1)
+}
+
+predicted_values <- logistic_regression %>%
+  spread_draws(b_Intercept, b_conditionidentification, `b_swr0.02`, `b_swr0.04`, `b_swr0.06`, `b_swr0.08`, `b_swr0.1`, `b_swr0.12`, `b_swr0.14`, `b_swr0.16`, `b_swr0.18`, `b_swr0.2`, `b_swr0.22`, `b_swr0.24`, `b_swr0.26`, `b_swr0.28`, `b_swr0.3`, `b_swr0.32`, `b_swr0.34`, `b_swr0.36`, `b_swr0.38`, `b_swr0.4`, `b_swr0.42`, `b_swr0.44`, `b_swr0.46`, `b_swr0.48`, `b_swr0.5`, `b_swr0.52`, `b_swr0.54`, `b_swr0.56`, `b_swr0.58`, `b_swr0.6`, `b_swr0.62`, `b_swr0.64`, `b_swr0.66`, `b_swr0.68`, `b_swr0.7`, `b_swr0.72`, `b_swr0.74`, `b_swr0.76`, `b_swr0.78`, `b_swr0.8`, `b_swr0.82`, `b_swr0.84`, `b_swr0.86`, `b_swr0.88`, `b_swr0.9`, `b_swr0.92`, `b_swr0.94`, `b_swr0.96`, `b_swr0.98`, `b_swr1`, `b_conditionidentification:swr0.02`, `b_conditionidentification:swr0.04`, `b_conditionidentification:swr0.06`, `b_conditionidentification:swr0.08`, `b_conditionidentification:swr0.1`, `b_conditionidentification:swr0.12`, `b_conditionidentification:swr0.14`, `b_conditionidentification:swr0.16`, `b_conditionidentification:swr0.18`, `b_conditionidentification:swr0.2`, `b_conditionidentification:swr0.22`, `b_conditionidentification:swr0.24`, `b_conditionidentification:swr0.26`, `b_conditionidentification:swr0.28`, `b_conditionidentification:swr0.3`, `b_conditionidentification:swr0.32`, `b_conditionidentification:swr0.34`, `b_conditionidentification:swr0.36`, `b_conditionidentification:swr0.38`, `b_conditionidentification:swr0.4`, `b_conditionidentification:swr0.42`, `b_conditionidentification:swr0.44`, `b_conditionidentification:swr0.46`, `b_conditionidentification:swr0.48`, `b_conditionidentification:swr0.5`, `b_conditionidentification:swr0.52`, `b_conditionidentification:swr0.54`, `b_conditionidentification:swr0.56`, `b_conditionidentification:swr0.58`, `b_conditionidentification:swr0.6`, `b_conditionidentification:swr0.62`, `b_conditionidentification:swr0.64`, `b_conditionidentification:swr0.66`, `b_conditionidentification:swr0.68`, `b_conditionidentification:swr0.7`, `b_conditionidentification:swr0.72`, `b_conditionidentification:swr0.74`, `b_conditionidentification:swr0.76`, `b_conditionidentification:swr0.78`, `b_conditionidentification:swr0.8`, `b_conditionidentification:swr0.82`, `b_conditionidentification:swr0.84`, `b_conditionidentification:swr0.86`, `b_conditionidentification:swr0.88`, `b_conditionidentification:swr0.9`, `b_conditionidentification:swr0.92`, `b_conditionidentification:swr0.94`, `b_conditionidentification:swr0.96`, `b_conditionidentification:swr0.98`, `b_conditionidentification:swr1`) %>% 
+  mutate(
+    disc_E00 = b_Intercept,
+    disc_E01 = b_Intercept + `b_swr0.02`,
+    disc_E02 = b_Intercept + `b_swr0.04`,
+    disc_E03 = b_Intercept + `b_swr0.06`,
+    disc_E04 = b_Intercept + `b_swr0.08`,
+    disc_E05 = b_Intercept + `b_swr0.1`,
+    disc_E06 = b_Intercept + `b_swr0.12`,
+    disc_E07 = b_Intercept + `b_swr0.14`,
+    disc_E08 = b_Intercept + `b_swr0.16`,
+    disc_E09 = b_Intercept + `b_swr0.18`,
+    disc_E10 = b_Intercept + `b_swr0.2`,
+    disc_E11 = b_Intercept + `b_swr0.22`,
+    disc_E12 = b_Intercept + `b_swr0.24`,
+    disc_E13 = b_Intercept + `b_swr0.26`,
+    disc_E14 = b_Intercept + `b_swr0.28`,
+    disc_E15 = b_Intercept + `b_swr0.3`,
+    disc_E16 = b_Intercept + `b_swr0.32`,
+    disc_E17 = b_Intercept + `b_swr0.34`,
+    disc_E18 = b_Intercept + `b_swr0.36`,
+    disc_E19 = b_Intercept + `b_swr0.38`,
+    disc_E20 = b_Intercept + `b_swr0.4`,
+    disc_E21 = b_Intercept + `b_swr0.42`,
+    disc_E22 = b_Intercept + `b_swr0.44`,
+    disc_E23 = b_Intercept + `b_swr0.46`,
+    disc_E24 = b_Intercept + `b_swr0.48`,
+    disc_E25 = b_Intercept + `b_swr0.5`,
+    disc_E26 = b_Intercept + `b_swr0.52`,
+    disc_E27 = b_Intercept + `b_swr0.54`,
+    disc_E28 = b_Intercept + `b_swr0.56`,
+    disc_E29 = b_Intercept + `b_swr0.58`,
+    disc_E30 = b_Intercept + `b_swr0.6`,
+    disc_E31 = b_Intercept + `b_swr0.62`,
+    disc_E32 = b_Intercept + `b_swr0.64`,
+    disc_E33 = b_Intercept + `b_swr0.66`,
+    disc_E34 = b_Intercept + `b_swr0.68`,
+    disc_E35 = b_Intercept + `b_swr0.7`,
+    disc_E36 = b_Intercept + `b_swr0.72`,
+    disc_E37 = b_Intercept + `b_swr0.74`,
+    disc_E38 = b_Intercept + `b_swr0.76`,
+    disc_E39 = b_Intercept + `b_swr0.78`,
+    disc_E40 = b_Intercept + `b_swr0.8`,
+    disc_E41 = b_Intercept + `b_swr0.82`,
+    disc_E42 = b_Intercept + `b_swr0.84`,
+    disc_E43 = b_Intercept + `b_swr0.86`,
+    disc_E44 = b_Intercept + `b_swr0.88`,
+    disc_E45 = b_Intercept + `b_swr0.9`,
+    disc_E46 = b_Intercept + `b_swr0.92`,
+    disc_E47 = b_Intercept + `b_swr0.94`,
+    disc_E48 = b_Intercept + `b_swr0.96`,
+    disc_E49 = b_Intercept + `b_swr0.98`,
+    disc_E50 = b_Intercept + `b_swr1`,
+    iden_E00 = b_Intercept + b_conditionidentification,
+    iden_E01 = b_Intercept + b_conditionidentification + `b_swr0.02` + `b_conditionidentification:swr0.02`,
+    iden_E02 = b_Intercept + b_conditionidentification + `b_swr0.04` + `b_conditionidentification:swr0.04`,
+    iden_E03 = b_Intercept + b_conditionidentification + `b_swr0.06` + `b_conditionidentification:swr0.06`,
+    iden_E04 = b_Intercept + b_conditionidentification + `b_swr0.08` + `b_conditionidentification:swr0.08`,
+    iden_E05 = b_Intercept + b_conditionidentification + `b_swr0.1` + `b_conditionidentification:swr0.1`,
+    iden_E06 = b_Intercept + b_conditionidentification + `b_swr0.12` + `b_conditionidentification:swr0.12`,
+    iden_E07 = b_Intercept + b_conditionidentification + `b_swr0.14` + `b_conditionidentification:swr0.14`,
+    iden_E08 = b_Intercept + b_conditionidentification + `b_swr0.16` + `b_conditionidentification:swr0.16`,
+    iden_E09 = b_Intercept + b_conditionidentification + `b_swr0.18` + `b_conditionidentification:swr0.18`,
+    iden_E10 = b_Intercept + b_conditionidentification + `b_swr0.2` + `b_conditionidentification:swr0.2`,
+    iden_E11 = b_Intercept + b_conditionidentification + `b_swr0.22` + `b_conditionidentification:swr0.22`,
+    iden_E12 = b_Intercept + b_conditionidentification + `b_swr0.24` + `b_conditionidentification:swr0.24`,
+    iden_E13 = b_Intercept + b_conditionidentification + `b_swr0.26` + `b_conditionidentification:swr0.26`,
+    iden_E14 = b_Intercept + b_conditionidentification + `b_swr0.28` + `b_conditionidentification:swr0.28`,
+    iden_E15 = b_Intercept + b_conditionidentification + `b_swr0.3` + `b_conditionidentification:swr0.3`,
+    iden_E16 = b_Intercept + b_conditionidentification + `b_swr0.32` + `b_conditionidentification:swr0.32`,
+    iden_E17 = b_Intercept + b_conditionidentification + `b_swr0.34` + `b_conditionidentification:swr0.34`,
+    iden_E18 = b_Intercept + b_conditionidentification + `b_swr0.36` + `b_conditionidentification:swr0.36`,
+    iden_E19 = b_Intercept + b_conditionidentification + `b_swr0.38` + `b_conditionidentification:swr0.38`,
+    iden_E20 = b_Intercept + b_conditionidentification + `b_swr0.4` + `b_conditionidentification:swr0.4`,
+    iden_E21 = b_Intercept + b_conditionidentification + `b_swr0.42` + `b_conditionidentification:swr0.42`,
+    iden_E22 = b_Intercept + b_conditionidentification + `b_swr0.44` + `b_conditionidentification:swr0.44`,
+    iden_E23 = b_Intercept + b_conditionidentification + `b_swr0.46` + `b_conditionidentification:swr0.46`,
+    iden_E24 = b_Intercept + b_conditionidentification + `b_swr0.48` + `b_conditionidentification:swr0.48`,
+    iden_E25 = b_Intercept + b_conditionidentification + `b_swr0.5` + `b_conditionidentification:swr0.5`,
+    iden_E26 = b_Intercept + b_conditionidentification + `b_swr0.52` + `b_conditionidentification:swr0.52`,
+    iden_E27 = b_Intercept + b_conditionidentification + `b_swr0.54` + `b_conditionidentification:swr0.54`,
+    iden_E28 = b_Intercept + b_conditionidentification + `b_swr0.56` + `b_conditionidentification:swr0.56`,
+    iden_E29 = b_Intercept + b_conditionidentification + `b_swr0.58` + `b_conditionidentification:swr0.58`,
+    iden_E30 = b_Intercept + b_conditionidentification + `b_swr0.6` + `b_conditionidentification:swr0.6`,
+    iden_E31 = b_Intercept + b_conditionidentification + `b_swr0.62` + `b_conditionidentification:swr0.62`,
+    iden_E32 = b_Intercept + b_conditionidentification + `b_swr0.64` + `b_conditionidentification:swr0.64`,
+    iden_E33 = b_Intercept + b_conditionidentification + `b_swr0.66` + `b_conditionidentification:swr0.66`,
+    iden_E34 = b_Intercept + b_conditionidentification + `b_swr0.68` + `b_conditionidentification:swr0.68`,
+    iden_E35 = b_Intercept + b_conditionidentification + `b_swr0.7` + `b_conditionidentification:swr0.7`,
+    iden_E36 = b_Intercept + b_conditionidentification + `b_swr0.72` + `b_conditionidentification:swr0.72`,
+    iden_E37 = b_Intercept + b_conditionidentification + `b_swr0.74` + `b_conditionidentification:swr0.74`,
+    iden_E38 = b_Intercept + b_conditionidentification + `b_swr0.76` + `b_conditionidentification:swr0.76`,
+    iden_E39 = b_Intercept + b_conditionidentification + `b_swr0.78` + `b_conditionidentification:swr0.78`,
+    iden_E40 = b_Intercept + b_conditionidentification + `b_swr0.8` + `b_conditionidentification:swr0.8`,
+    iden_E41 = b_Intercept + b_conditionidentification + `b_swr0.82` + `b_conditionidentification:swr0.82`,
+    iden_E42 = b_Intercept + b_conditionidentification + `b_swr0.84` + `b_conditionidentification:swr0.84`,
+    iden_E43 = b_Intercept + b_conditionidentification + `b_swr0.86` + `b_conditionidentification:swr0.86`,
+    iden_E44 = b_Intercept + b_conditionidentification + `b_swr0.88` + `b_conditionidentification:swr0.88`,
+    iden_E45 = b_Intercept + b_conditionidentification + `b_swr0.9` + `b_conditionidentification:swr0.9`,
+    iden_E46 = b_Intercept + b_conditionidentification + `b_swr0.92` + `b_conditionidentification:swr0.92`,
+    iden_E47 = b_Intercept + b_conditionidentification + `b_swr0.94` + `b_conditionidentification:swr0.94`,
+    iden_E48 = b_Intercept + b_conditionidentification + `b_swr0.96` + `b_conditionidentification:swr0.96`,
+    iden_E49 = b_Intercept + b_conditionidentification + `b_swr0.98` + `b_conditionidentification:swr0.98`,
+    iden_E50 = b_Intercept + b_conditionidentification + `b_swr1` + `b_conditionidentification:swr1`,
+    ) %>% 
+  select(starts_with(c("disc", "iden"))) %>% 
+  gather(key = "parameter", value = "posterior") %>% 
+  group_by(parameter) %>% 
+  summarize(mean = map_dbl(mean(posterior), logistic),
+            lowCI = map_dbl(quantile(posterior, prob = 0.025), logistic),
+            highCI = map_dbl(quantile(posterior, prob = 0.975), logistic)) %>% 
+  mutate(swr = rep(seq(from = 0, to = 1, by = 0.02), 2),
+         condition = ifelse(grepl('^disc', .$parameter), 'discrimination', 'identification'))
+```
+
+
+```{r plot_pred_values}
+clean_data$swr <- as.numeric(levels(clean_data$swr))[clean_data$swr]
+
+ggplot(data = predicted_values, aes(x = swr, y = mean, color = condition)) +
+  geom_point(data = clean_data, 
+             aes(x = swr, y = correct_response),
+             position = position_jitter(height = 0.02), alpha = 0.1) +
+  geom_ribbon(aes(ymin = lowCI, ymax = highCI), alpha = 0.2) +
+  geom_line(size = 1, color = "gray39") +
+  facet_grid(~ condition) +
+  labs(
+    x = "switch rate",
+    y = "proportion of correct answers",
+    title = "Proportion of correct answers across switch rates for both conditions",
+    subtitle = "With original data points and 95% Credible Intervals"
+  ) +
+  theme(plot.title = element_text(size=16),
+        legend.position = "none")
+  
+```
+
+In this plot we can see that there is a lot of uncertainty around the mean estimates for each switch rate (in both conditions). We can also see that for low and high switch rates (from 0 to 0.25 and from 0.75 to 1) there is a little bit more variability in the discrimination condition. This could be due to lack of concentration. Another visible difference is that the graph in the discrimination condition has a narrower region of less correct answers. 
+  
+### Conclusion
+
+Since we have only little data, we don't draw any conclusion regarding our hypothesis.
