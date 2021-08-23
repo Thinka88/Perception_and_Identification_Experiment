@@ -18,9 +18,6 @@ library(tidyverse)
 # package for Bayesian regression modeling
 library(brms)
 
-# package for visualization
-library(tidybayes)
-
 # package to visualize 
 library(bayesplot)
 
@@ -54,11 +51,22 @@ data <- read_csv("results_276_XPLab+SS21+-+Group+13+-+Main_Mara,+Linus,+Cosima,+
 glimpse(data)
 ```
 
-
 ### Participants
 
-A total of 19 participants took part in an online version of a Perception of Randomness task.
-There were 5 male, 12 female and 2 participants who chose not to answer, with ages ranging from 20 to 64. There were 10 participants in the discrimination condition and 9 in the identification condition. The first 4 participants contributed 510 data points (10 for each switch rate), the subsequent participants contributed 6 data points for each switch rate plus 10 practice trials.
+```{r}
+d_summary <- data %>% 
+  mutate(language = case_when(languages == "deutsch" ~ "german",
+                              languages == "German" ~ "german",
+                              TRUE ~ languages)) %>% 
+  group_by(submission_id) %>% 
+  summarize(language = unique(language),
+            gender = unique(gender),
+            age = unique(age))
+```
+
+A total of `r d_summary$submission_id %>% length` participants took part in an online version of a Perception of Randomness task.
+There were `r sum(d_summary$gender == 'male', na.rm = TRUE)` male, `r sum(d_summary$gender == 'female', na.rm = TRUE)` female and `r sum(is.na(d_summary$gender))` participants who chose not to answer, with ages ranging from `r d_summary$age %>% unique %>% min(na.rm = TRUE)` to `r d_summary$age %>% unique %>% max(na.rm = TRUE)`. There were 10 participants in the discrimination condition and 9 in the identification condition. The first 4 participants contributed 510 data points (10 for each switch rate), the subsequent participants contributed 6 data points for each switch rate plus 10 practice trials.
+There were `r sum(d_summary$language == 'german', na.rm = TRUE)` German native speakers, 1 participant who speaks German and English, 1 participant who speaks English and Arabic and `r sum(is.na(d_summary$language))` participants who did not answer this question.
 
 ### General properties and cleaning
 

@@ -12,17 +12,11 @@ knitr::opts_chunk$set(echo = FALSE, cache = FALSE, message = FALSE, warning = FA
 ```
 
 ```{r libraries, message = FALSE, warning = FALSE, include = FALSE}
-
-# check again, which libraries are really needed
-
 # package for convenience functions (e.g. ggplot2, dplyr, etc.)
 library(tidyverse)
 
 # package for Bayesian regression modeling
 library(brms)
-
-# package for visualization
-library(tidybayes)
 
 # package to visualize 
 library(bayesplot)
