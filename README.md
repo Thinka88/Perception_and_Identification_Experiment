@@ -6,7 +6,7 @@ Zhao, Jiaying & Hahn, Ulrike & Osherson, Daniel. (2014). Perception and Identifi
 
 The link to the original study can be found [here](https://doi.org/10.1037/a0036816)
 
-If you just want to access the code of the implemented experiment, please follow this link: [Code Repo](https://https://github.com/Thinka88/Perception-and-Identification-Experiment-Code)
+If you just want to access the code of the implemented experiment, please follow this link: [Code Repo](https://github.com/Thinka88/Perception-and-Identification-Experiment-Code.git)
 
 ## Experiment
 
