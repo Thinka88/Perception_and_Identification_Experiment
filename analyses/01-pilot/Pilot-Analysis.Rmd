@@ -74,6 +74,7 @@ d_summary <- data %>%
             condition = unique(trial_name),
             age = unique(age),
             language = unique(languages))
+d_summary
 ```
 
 A total of `r d_summary$submission_id %>% length` participants took part in an online version of a Perception of Randomness task.
@@ -392,7 +393,7 @@ ggplot(data = predicted_values, aes(x = swr, y = mean, color = condition)) +
   labs(
     x = "switch rate",
     y = "proportion of correct answers",
-    title = "Proportion of correct answers across switch rates for both conditions",
+    title = "Posterior estimated proportion of correct answers across switch rates for both conditions",
     subtitle = "With original data points and 95% Credible Intervals"
   ) +
   theme(plot.title = element_text(size=16),
