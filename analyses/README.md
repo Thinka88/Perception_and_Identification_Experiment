@@ -1,1 +1,2 @@
-This folder contains all analysis scripts from the pilot and main study.
+- `01-pilot` contains the analysis script for our small (and not so expressive) pilot study.
+- `02-main` contains the analysis script from the main study.

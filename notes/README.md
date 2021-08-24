@@ -1,1 +1,1 @@
-Here, mainly TODOs and questions to be cleared in the process were collected.
+Here, TODOs and questions which were to be cleared in the process were collected. This is not relevant for the study itself, but it has been helpful for the group work.

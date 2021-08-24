@@ -1,1 +1,2 @@
-In this folder all our raw collected data from the pilot and main study can be found
+- `01-pilot` contains the raw data set from our pilot study.
+- `02-main` contains the raw collected data from the main study.

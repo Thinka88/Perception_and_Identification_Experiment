@@ -1,3 +1,3 @@
-In <i>01_preregistration</i>, our preregistration can be found. It provides information on the experiment conduction, the analysis and its variables. 
-In <i>02_experimental_design</i>, our experimental design plan can be found, where the experimental procedure, stimuli and so on are documented.
-In <i>03_final_paper</i>, our final paper with our results and further discussion can be found.
+In `01_preregistration`, our preregistration can be found. It provides information on the experiment conduction, its variables and the analysis. 
+In `02_experimental_design`, our experimental design plan can be found. It documents the experimental procedure and the stimuli (generation).
+In `03_final_paper`, our final paper with results and further discussion can be found.
