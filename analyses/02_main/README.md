@@ -1,1 +1,1 @@
-This folder contains our analysis script from the main study
+This folder contains our analysis script from the main study.
