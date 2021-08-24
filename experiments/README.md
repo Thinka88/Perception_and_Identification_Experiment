@@ -1,4 +1,4 @@
-`images` contains some example stimuli pictures.
+- `images` contains some example stimuli pictures.
 
 The other files are used to implement the experiment itsself, using <a href="https://magpie-ea.github.io/magpie-site/">_magpie</a>. Here are short descriptions of the (important) files: 
   - `01_custom_styles.css`: contains custom styles
