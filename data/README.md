@@ -1,2 +1,2 @@
-- `01-pilot` contains the raw data set from our pilot study.
-- `02-main` contains the raw collected data from the main study.
+- `01_pilot` contains the raw data set from our pilot study.
+- `02_main` contains the raw collected data from the main study.
